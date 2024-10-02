@@ -1,10 +1,10 @@
 import express, { Express } from "express";
 import userRouter from "./router/userRouter";
 
-const appExpress: Express = express();
+const app: Express = express();
 
-appExpress.use(express.json());
+app.use(express.json());
 
-appExpress.use("/api/v1/users", userRouter);
+app.use("/api/v1/users", userRouter);
 
-export default appExpress;
+export default app;

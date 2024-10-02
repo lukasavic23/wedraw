@@ -5,3 +5,8 @@ export interface SignUpBody {
   password: string;
   passwordConfirm: string;
 }
+
+export interface LoginBody {
+  email: string;
+  password: string;
+}

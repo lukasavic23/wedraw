@@ -8,6 +8,7 @@ interface IUser {
   email: string;
   password: string;
   passwordConfirm: string | undefined;
+  isPasswordCorrect: (cadidate: string, real: string) => Promise<boolean>;
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -38,11 +39,18 @@ const userSchema = new mongoose.Schema<IUser>({
 });
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password") || !this.password) return next();
 
   this.password = await bcrypt.hash(this.password, 12);
   this.passwordConfirm = undefined;
 });
+
+userSchema.methods.isPasswordCorrect = async function (
+  candidate: string,
+  real: string
+) {
+  return await bcrypt.compare(candidate, real);
+};
 
 const User = mongoose.model("User", userSchema);
 export default User;
