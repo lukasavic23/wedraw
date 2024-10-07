@@ -1,0 +1,13 @@
+.logo {
+  font-size: 20px;
+}
+
+.logo :first-child {
+  color: rgb(22, 85, 134);
+  font-weight: bold;
+}
+
+.logo :last-child {
+  color: rgb(255, 0, 89);
+  font-weight: 500;
+}
