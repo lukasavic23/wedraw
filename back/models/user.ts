@@ -8,7 +8,11 @@ interface IUser {
   email: string;
   password: string;
   passwordConfirm: string | undefined;
-  isPasswordCorrect: (cadidate: string, real: string) => Promise<boolean>;
+  isPasswordCorrect: (
+    candidatePass: string,
+    userPass: string
+  ) => Promise<boolean>;
+  refreshToken: string | undefined;
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -36,6 +40,10 @@ const userSchema = new mongoose.Schema<IUser>({
       message: "Passwords do not match!",
     },
   },
+  refreshToken: {
+    type: String,
+    select: false,
+  },
 });
 
 userSchema.pre("save", async function (next) {
@@ -46,10 +54,10 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.isPasswordCorrect = async function (
-  candidate: string,
-  real: string
+  candidatePass: string,
+  userPass: string
 ) {
-  return await bcrypt.compare(candidate, real);
+  return await bcrypt.compare(candidatePass, userPass);
 };
 
 const User = mongoose.model("User", userSchema);

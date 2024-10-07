@@ -2,22 +2,35 @@ import { NextFunction, Request, Response } from "express";
 import User from "../models/user";
 import { LoginBody, SignUpBody } from "../types/AuthTypes";
 import { ResponseStatus } from "../enums/common";
-import { signJWTToken } from "../utils/helpers";
+import jsonwebtoken from "jsonwebtoken";
 
 function createAndReturnToken(
   user: Awaited<ReturnType<typeof User.create>>[0],
   statusCode: number,
   res: Response
 ) {
-  const responseUser = { ...user.toObject(), password: undefined };
-  const jwt = signJWTToken(user.id);
+  const accessToken = jsonwebtoken.sign(
+    { id: user.id },
+    process.env.ACCESS_SECRET as string,
+    { expiresIn: process.env.ACCESS_EXPIRES_IN }
+  );
+  const refreshToken = jsonwebtoken.sign(
+    { id: user.id },
+    process.env.REFRESH_SECRET as string,
+    { expiresIn: process.env.REFRESH_EXPIRES_IN }
+  );
 
-  res.cookie("jwt", jwt, {
-    expires: new Date(
-      Date.now() +
-        Number(process.env.JWT_COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000
-    ),
+  const responseUser = {
+    ...user.toObject(),
+    password: undefined,
+    refreshToken: undefined,
+    accessToken,
+  };
+
+  res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
+    // 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
   res
@@ -80,7 +93,4 @@ export const login = async function (
   }
 };
 
-export const logout = function (req: Request, res: Response) {
-  res.cookie("jwt", "", { httpOnly: true });
-  res.status(204).json({ status: "success" });
-};
+// TODO: implement LOGOUT (invalidate tokens)
