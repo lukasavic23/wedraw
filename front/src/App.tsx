@@ -1,10 +1,10 @@
 import styles from "./App.module.css";
-import Login from "./containers/Login/Login";
+import Routing from "./components/Routing/Routing";
 
 function App() {
   return (
     <div className={styles.app}>
-      <Login></Login>
+      <Routing />
     </div>
   );
 }

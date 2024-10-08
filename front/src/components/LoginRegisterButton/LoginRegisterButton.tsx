@@ -1,22 +1,22 @@
+import { ComponentProps } from "react";
 import styles from "./LoginRegisterButton.module.css";
 
-interface LoginRegisterButtonProps {
-  type: "login" | "register";
-  disabled: boolean;
-  onClick: () => void;
+interface LoginRegisterButtonProps extends ComponentProps<"button"> {
+  text: string;
   className?: string;
 }
 
 const LoginRegisterButton = (props: LoginRegisterButtonProps) => {
-  const { type, disabled, onClick, className } = props;
+  const { text, disabled, onClick, className, ...restProps } = props;
 
   return (
     <button
       className={`${styles.button} ${className ?? ""}`}
       disabled={disabled}
       onClick={onClick}
+      {...restProps}
     >
-      {type === "login" ? "Log in" : "Register"}
+      {text}
     </button>
   );
 };
