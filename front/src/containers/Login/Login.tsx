@@ -5,6 +5,7 @@ import styles from "./Login.module.css";
 import { useNavigate } from "react-router-dom";
 import { URLRoutes } from "../../enums/Routes";
 import LoginService from "../../services/LoginService";
+import { useAuthContext } from "../../context/AuthProvider";
 
 interface FormValues {
   email: string | undefined;
@@ -13,6 +14,7 @@ interface FormValues {
 
 const Login = () => {
   const navigate = useNavigate();
+  const { setAuth } = useAuthContext();
 
   const [formValues, setFormValues] = useState<FormValues>({
     email: undefined,
@@ -27,8 +29,9 @@ const Login = () => {
     if (!email || !password) return;
 
     LoginService.login({ email, password })
-      .then(() => {
+      .then((response) => {
         navigate(URLRoutes.Welcome);
+        setAuth(response.data.data);
       })
       .catch((e) => {
         console.log(e);

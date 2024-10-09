@@ -20,22 +20,24 @@ function createAndReturnToken(
     { expiresIn: process.env.REFRESH_EXPIRES_IN }
   );
 
+  const dbUser = { ...user.toObject() };
   const responseUser = {
-    ...user.toObject(),
-    password: undefined,
-    refreshToken: undefined,
+    name: dbUser.name,
+    lastName: dbUser.lastName,
+    email: dbUser.email,
     accessToken,
   };
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    // 7 days
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 
   res
     .status(statusCode)
     .json({ status: ResponseStatus.Success, data: responseUser });
+
+  return refreshToken;
 }
 
 export const signUp = async function (
@@ -52,7 +54,8 @@ export const signUp = async function (
       passwordConfirm: req.body.passwordConfirm,
     });
 
-    createAndReturnToken(user, 201, res);
+    const refreshToken = createAndReturnToken(user, 201, res);
+    await User.findOneAndUpdate({ _id: user.id }, { refreshToken });
   } catch (error) {
     res
       .status(401)
@@ -85,11 +88,42 @@ export const login = async function (
       });
     }
 
-    createAndReturnToken(user, 200, res);
+    const refreshToken = createAndReturnToken(user, 200, res);
+    await User.findOneAndUpdate({ _id: user.id }, { refreshToken });
   } catch (error) {
     res
       .status(401)
       .json({ status: ResponseStatus.Error, message: error.message });
+  }
+};
+
+export const getUser = async function (req: Request, res: Response) {
+  try {
+    const jwtUser = jsonwebtoken.verify(
+      req.cookies.refreshToken,
+      process.env.REFRESH_SECRET as string
+    ) as { id: string; iat: number; exp: number };
+
+    const user = await User.findById(jwtUser.id);
+    console.log(user);
+
+    const accessToken = jsonwebtoken.sign(
+      { id: user!.id },
+      process.env.ACCESS_SECRET as string,
+      { expiresIn: process.env.ACCESS_EXPIRES_IN }
+    );
+
+    const responseUser = {
+      name: user?.name,
+      lastName: user?.lastName,
+      email: user?.email,
+      accessToken,
+    };
+    res
+      .status(200)
+      .json({ status: ResponseStatus.Success, data: responseUser });
+  } catch (error) {
+    console.log(error);
   }
 };
 

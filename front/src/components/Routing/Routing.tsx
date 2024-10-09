@@ -1,24 +1,33 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { URLRoutes } from "../../enums/Routes";
 import Login from "../../containers/Login/Login";
+import ProtectedRoute from "./ProtectedRoute";
+import Welcome from "../../containers/Welcome/Welcome";
+
+const guestRoutes = [
+  { path: URLRoutes.Empty, component: <Login /> },
+  { path: URLRoutes.Register, component: <p>Register</p> },
+];
+
+const secureRoutes = [{ path: URLRoutes.Welcome, component: <Welcome /> }];
 
 const Routing = () => {
-  const router = createBrowserRouter([
-    {
-      path: URLRoutes.Empty,
-      element: <Login />,
-    },
-    {
-      path: URLRoutes.Register,
-      element: <p>biocrack</p>,
-    },
-    {
-      path: URLRoutes.Welcome,
-      element: <p>welcome to my page</p>,
-    },
-  ]);
-
-  return <RouterProvider router={router} />;
+  return (
+    <BrowserRouter>
+      <Routes>
+        {guestRoutes.map((route) => (
+          <Route key={route.path} path={route.path} element={route.component} />
+        ))}
+        {secureRoutes.map((route) => (
+          <Route
+            key={route.path}
+            path={route.path}
+            element={<ProtectedRoute>{route.component}</ProtectedRoute>}
+          />
+        ))}
+      </Routes>
+    </BrowserRouter>
+  );
 };
 
 export default Routing;
