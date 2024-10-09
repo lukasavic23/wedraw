@@ -3,6 +3,7 @@ import { URLRoutes } from "../../enums/Routes";
 import Login from "../../containers/Login/Login";
 import ProtectedRoute from "./ProtectedRoute";
 import Welcome from "../../containers/Welcome/Welcome";
+import PersistentLogin from "./PersistentLogin";
 
 const guestRoutes = [
   { path: URLRoutes.Empty, component: <Login /> },
@@ -15,16 +16,24 @@ const Routing = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {guestRoutes.map((route) => (
-          <Route key={route.path} path={route.path} element={route.component} />
-        ))}
-        {secureRoutes.map((route) => (
-          <Route
-            key={route.path}
-            path={route.path}
-            element={<ProtectedRoute>{route.component}</ProtectedRoute>}
-          />
-        ))}
+        <Route element={<PersistentLogin isGuestRoute />}>
+          {guestRoutes.map((route) => (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={route.component}
+            />
+          ))}
+        </Route>
+        <Route element={<PersistentLogin />}>
+          {secureRoutes.map((route) => (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={<ProtectedRoute>{route.component}</ProtectedRoute>}
+            />
+          ))}
+        </Route>
       </Routes>
     </BrowserRouter>
   );

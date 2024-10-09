@@ -4,7 +4,7 @@ import Logo from "../../components/Logo/Logo";
 import styles from "./Login.module.css";
 import { useNavigate } from "react-router-dom";
 import { URLRoutes } from "../../enums/Routes";
-import LoginService from "../../services/LoginService";
+import AuthenticationService from "../../services/AuthenticationService";
 import { useAuthContext } from "../../context/AuthProvider";
 
 interface FormValues {
@@ -28,7 +28,7 @@ const Login = () => {
 
     if (!email || !password) return;
 
-    LoginService.login({ email, password })
+    AuthenticationService.login({ email, password })
       .then((response) => {
         navigate(URLRoutes.Welcome);
         setAuth(response.data.data);

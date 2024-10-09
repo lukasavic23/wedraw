@@ -2,16 +2,16 @@ import axios from "../../config/axios";
 import { AxiosResponseType } from "../interfaces/Common";
 import { LoginPayload, LoginResponse } from "../interfaces/Login";
 
-class LoginService {
+class AuthenticationService {
   static login = function (
     params: LoginPayload
   ): AxiosResponseType<LoginResponse> {
     return axios.post("/users/login", params);
   };
 
-  static getUser = function () {
-    return axios.get("/users/me");
+  static refreshUser = function (): AxiosResponseType<LoginResponse> {
+    return axios.get("/users/refresh");
   };
 }
 
-export default LoginService;
+export default AuthenticationService;

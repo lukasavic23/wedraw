@@ -31,6 +31,8 @@ function createAndReturnToken(
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    sameSite: "none",
+    secure: true,
   });
 
   res
@@ -97,15 +99,21 @@ export const login = async function (
   }
 };
 
-export const getUser = async function (req: Request, res: Response) {
+export const refresh = async function (req: Request, res: Response) {
+  console.log(req.cookies.refreshToken, "refreshtoken");
   try {
+    if (!req.cookies.refreshToken) {
+      return res
+        .status(401)
+        .json({ status: ResponseStatus.Error, message: "Not authorized!" });
+    }
+
     const jwtUser = jsonwebtoken.verify(
       req.cookies.refreshToken,
       process.env.REFRESH_SECRET as string
     ) as { id: string; iat: number; exp: number };
 
     const user = await User.findById(jwtUser.id);
-    console.log(user);
 
     const accessToken = jsonwebtoken.sign(
       { id: user!.id },
@@ -119,11 +127,12 @@ export const getUser = async function (req: Request, res: Response) {
       email: user?.email,
       accessToken,
     };
+
     res
       .status(200)
       .json({ status: ResponseStatus.Success, data: responseUser });
   } catch (error) {
-    console.log(error);
+    console.log(error, "error");
   }
 };
 
