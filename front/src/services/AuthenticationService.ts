@@ -12,6 +12,10 @@ class AuthenticationService {
   static refreshUser = function (): AxiosResponseType<LoginResponse> {
     return axios.get("/users/refresh");
   };
+
+  static logout = function () {
+    return axios.get("/users/logout");
+  };
 }
 
 export default AuthenticationService;

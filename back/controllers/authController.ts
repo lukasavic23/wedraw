@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import User from "../models/user";
-import { LoginBody, SignUpBody } from "../types/AuthTypes";
+import { JWTToken, LoginBody, SignUpBody } from "../types/AuthTypes";
 import { ResponseStatus } from "../enums/common";
-import jsonwebtoken from "jsonwebtoken";
+import jsonwebtoken, { JsonWebTokenError, VerifyErrors } from "jsonwebtoken";
 
 function createAndReturnToken(
   user: Awaited<ReturnType<typeof User.create>>[0],
@@ -100,23 +100,40 @@ export const login = async function (
 };
 
 export const refresh = async function (req: Request, res: Response) {
-  console.log(req.cookies.refreshToken, "refreshtoken");
   try {
-    if (!req.cookies.refreshToken) {
-      return res
-        .status(401)
-        .json({ status: ResponseStatus.Error, message: "Not authorized!" });
+    const receivedRefreshToken = req.cookies.refreshToken;
+
+    // token doesn't exist
+    if (!receivedRefreshToken) {
+      return res.status(401).json({
+        status: ResponseStatus.Error,
+        message: "Not authorized!",
+      });
     }
 
-    const jwtUser = jsonwebtoken.verify(
-      req.cookies.refreshToken,
+    // verify token expiry
+    const verifiedRefreshToken = jsonwebtoken.verify(
+      receivedRefreshToken,
       process.env.REFRESH_SECRET as string
-    ) as { id: string; iat: number; exp: number };
+    ) as JWTToken;
 
-    const user = await User.findById(jwtUser.id);
+    const user = await User.findById(verifiedRefreshToken.id);
+
+    if (!user) {
+      return res
+        .status(403)
+        .json({ status: ResponseStatus.Error, message: "User doesn't exist!" });
+    }
+
+    if (user.refreshToken !== receivedRefreshToken) {
+      return res.status(403).json({
+        status: ResponseStatus.Error,
+        message: "Session is not verified!",
+      });
+    }
 
     const accessToken = jsonwebtoken.sign(
-      { id: user!.id },
+      { id: user.id },
       process.env.ACCESS_SECRET as string,
       { expiresIn: process.env.ACCESS_EXPIRES_IN }
     );
@@ -132,8 +149,50 @@ export const refresh = async function (req: Request, res: Response) {
       .status(200)
       .json({ status: ResponseStatus.Success, data: responseUser });
   } catch (error) {
-    console.log(error, "error");
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({
+        status: ResponseStatus.Error,
+        message: "You are not authorized!",
+      });
+    }
   }
 };
 
-// TODO: implement LOGOUT (invalidate tokens)
+export const logout = async function (req: Request, res: Response) {
+  try {
+    const receivedRefreshToken = req.cookies.refreshToken;
+
+    if (!receivedRefreshToken) {
+      return res
+        .status(204)
+        .json({ status: ResponseStatus.Success, data: null });
+    }
+
+    const verifiedRefreshToken = jsonwebtoken.verify(
+      receivedRefreshToken,
+      process.env.REFRESH_SECRET as string
+    ) as JWTToken;
+
+    const user = await User.findById(verifiedRefreshToken.id);
+    if (!user) {
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+      });
+      return res
+        .status(204)
+        .json({ status: ResponseStatus.Success, data: null });
+    }
+
+    await User.findOneAndUpdate({ id: user.id }, { refreshToken: undefined });
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    });
+    res.status(204).json({ status: ResponseStatus.Success, data: null });
+  } catch (error) {
+    console.log(error, "logout error");
+  }
+};

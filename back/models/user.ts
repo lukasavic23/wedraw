@@ -40,10 +40,7 @@ const userSchema = new mongoose.Schema<IUser>({
       message: "Passwords do not match!",
     },
   },
-  refreshToken: {
-    type: String,
-    select: false,
-  },
+  refreshToken: String,
 });
 
 userSchema.pre("save", async function (next) {
