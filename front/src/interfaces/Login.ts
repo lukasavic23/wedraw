@@ -3,9 +3,17 @@ export interface LoginPayload {
   password: string;
 }
 
-export interface LoginResponse {
+export interface AuthenticationResponse {
   name: string;
   lastName: string;
   email: string;
   accessToken: string;
+}
+
+export interface RegisterPayload {
+  name: string;
+  lastName: string;
+  email: string;
+  password: string;
+  passwordConfirm: string;
 }

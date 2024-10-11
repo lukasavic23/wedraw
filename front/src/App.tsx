@@ -1,13 +1,16 @@
 import styles from "./App.module.css";
 import Routing from "./components/Routing/Routing";
 import { AuthProvider } from "./context/AuthProvider";
+import { SnackbarProvider } from "./context/SnackbarProvider";
 
 function App() {
   return (
     <div className={styles.app}>
-      <AuthProvider>
-        <Routing />
-      </AuthProvider>
+      <SnackbarProvider>
+        <AuthProvider>
+          <Routing />
+        </AuthProvider>
+      </SnackbarProvider>
     </div>
   );
 }

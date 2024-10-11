@@ -1,0 +1,30 @@
+label.label {
+  color: rgb(108, 108, 108);
+  font-size: 14px;
+  padding-bottom: 10px;
+}
+
+input.input {
+  margin-top: 5px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #dfdfdf;
+  border-radius: 8px;
+  outline: none;
+}
+
+input.error_input {
+  border: 1px solid red;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-top: 5px;
+}
+
+.error_text {
+  color: red;
+  font-size: 14px;
+}

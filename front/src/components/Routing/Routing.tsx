@@ -4,10 +4,11 @@ import Login from "../../containers/Login/Login";
 import ProtectedRoute from "./ProtectedRoute";
 import Welcome from "../../containers/Welcome/Welcome";
 import PersistentLogin from "./PersistentLogin";
+import Register from "../../containers/Register/Register";
 
 const guestRoutes = [
   { path: URLRoutes.Empty, component: <Login /> },
-  { path: URLRoutes.Register, component: <p>Register</p> },
+  { path: URLRoutes.Register, component: <Register /> },
 ];
 
 const secureRoutes = [{ path: URLRoutes.Welcome, component: <Welcome /> }];

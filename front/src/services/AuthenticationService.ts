@@ -1,15 +1,25 @@
 import axios from "../../config/axios";
 import { AxiosResponseType } from "../interfaces/Common";
-import { LoginPayload, LoginResponse } from "../interfaces/Login";
+import {
+  LoginPayload,
+  AuthenticationResponse,
+  RegisterPayload,
+} from "../interfaces/Login";
 
 class AuthenticationService {
   static login = function (
     params: LoginPayload
-  ): AxiosResponseType<LoginResponse> {
+  ): AxiosResponseType<AuthenticationResponse> {
     return axios.post("/users/login", params);
   };
 
-  static refreshUser = function (): AxiosResponseType<LoginResponse> {
+  static register = function (
+    params: RegisterPayload
+  ): AxiosResponseType<AuthenticationResponse> {
+    return axios.post("/users/signup", params);
+  };
+
+  static refreshUser = function (): AxiosResponseType<AuthenticationResponse> {
     return axios.get("/users/refresh");
   };
 

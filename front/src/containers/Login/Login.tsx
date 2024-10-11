@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { URLRoutes } from "../../enums/Routes";
 import AuthenticationService from "../../services/AuthenticationService";
 import { useAuthContext } from "../../context/AuthProvider";
+import LoginRegisterInput from "../../components/LoginRegisterInput/LoginRegisterInput";
 
 interface FormValues {
   email: string | undefined;
@@ -21,7 +22,9 @@ const Login = () => {
     password: undefined,
   });
 
-  const isLoginDisabled = formValues.email === "" || formValues.password === "";
+  const isLoginDisabled = Object.values(formValues).some(
+    (formValue) => formValue === "" || formValue === undefined
+  );
 
   const handleLogin = () => {
     const { email, password } = formValues;
@@ -51,8 +54,8 @@ const Login = () => {
           }}
         >
           <div className={styles.input_wrapper}>
-            <label htmlFor="email">Email</label>
-            <input
+            <LoginRegisterInput
+              labelName="Email"
               name="email"
               type="email"
               autoFocus
@@ -66,8 +69,9 @@ const Login = () => {
             />
           </div>
           <div className={styles.input_wrapper}>
-            <label>Password</label>
-            <input
+            <LoginRegisterInput
+              labelName="Password"
+              name="password"
               type="password"
               value={formValues.password || ""}
               onChange={(e) => {

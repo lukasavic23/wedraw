@@ -1,7 +1,7 @@
 import { createContext, useState, ReactNode, useMemo, useContext } from "react";
-import { LoginResponse } from "../interfaces/Login";
+import { AuthenticationResponse } from "../interfaces/Login";
 
-type Auth = LoginResponse;
+type Auth = AuthenticationResponse;
 
 interface AuthProviderArgs {
   children: ReactNode;
