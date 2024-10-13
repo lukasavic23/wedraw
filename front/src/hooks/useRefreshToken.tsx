@@ -11,7 +11,7 @@ const useRefreshToken = () => {
       .then((response) => {
         setAuth(response.data.data);
       })
-      .catch((error) => console.log(error))
+      .catch(() => {})
       .finally(() => setIsFetching(false));
   }, [setAuth]);
 

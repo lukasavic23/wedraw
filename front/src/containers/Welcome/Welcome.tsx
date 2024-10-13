@@ -9,7 +9,9 @@ const Welcome = () => {
       .then(() => {
         setAuth(null);
       })
-      .catch((err) => console.log(err));
+      .catch(() => {
+        setAuth(null);
+      });
   };
 
   return (

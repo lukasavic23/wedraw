@@ -23,8 +23,6 @@ export const SnackbarProvider = ({ children }: SnackbarProviderArgs) => {
     [closeSnackbar, openSnackbar, snackbar]
   );
 
-  console.log(contextValue.snackbar);
-
   return (
     <SnackbarContext.Provider value={contextValue}>
       {snackbar.open ? (

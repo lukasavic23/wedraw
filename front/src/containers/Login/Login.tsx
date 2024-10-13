@@ -7,6 +7,7 @@ import { URLRoutes } from "../../enums/Routes";
 import AuthenticationService from "../../services/AuthenticationService";
 import { useAuthContext } from "../../context/AuthProvider";
 import LoginRegisterInput from "../../components/LoginRegisterInput/LoginRegisterInput";
+import { useSnackbarContext } from "../../context/SnackbarProvider";
 
 interface FormValues {
   email: string | undefined;
@@ -16,6 +17,7 @@ interface FormValues {
 const Login = () => {
   const navigate = useNavigate();
   const { setAuth } = useAuthContext();
+  const { openSnackbar } = useSnackbarContext();
 
   const [formValues, setFormValues] = useState<FormValues>({
     email: undefined,
@@ -36,8 +38,8 @@ const Login = () => {
         navigate(URLRoutes.Welcome);
         setAuth(response.data.data);
       })
-      .catch((e) => {
-        console.log(e);
+      .catch((err) => {
+        openSnackbar(err.response.data.message, "error");
       });
   };
 
