@@ -1,0 +1,9 @@
+.dashboard {
+  display: flex;
+  align-items: flex-start;
+  height: 100%;
+}
+
+.dashboard .dashboard_content {
+  width: 100%;
+}

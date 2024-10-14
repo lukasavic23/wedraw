@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { URLRoutes } from "../../enums/Routes";
 import Login from "../../containers/Login/Login";
 import ProtectedRoute from "./ProtectedRoute";
-import Welcome from "../../containers/Welcome/Welcome";
+import Welcome from "../../containers/Dashboard/Dashboard";
 import PersistentLogin from "./PersistentLogin";
 import Register from "../../containers/Register/Register";
 

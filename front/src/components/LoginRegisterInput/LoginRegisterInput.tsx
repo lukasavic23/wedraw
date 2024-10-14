@@ -1,6 +1,7 @@
 import { ComponentProps } from "react";
 import styles from "./LoginRegisterInput.module.css";
 import errorIcon from "../../assets/icon_error.svg";
+import classNames from "classnames";
 
 interface LoginRegisterInputProps extends ComponentProps<"input"> {
   labelName: string;
@@ -16,7 +17,7 @@ const LoginRegisterInput = (props: LoginRegisterInputProps) => {
         {labelName} {inputProps.required && "*"}
       </label>
       <input
-        className={`${styles.input} ${error ? styles.error_input : ""}`}
+        className={classNames(styles.input, error ? styles.error_input : "")}
         {...inputProps}
       />
       {error && (

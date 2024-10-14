@@ -1,0 +1,19 @@
+.new_sheet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  width: 100%;
+  background-color: #ebebeb;
+  border-radius: 8px;
+}
+
+.new_sheet:hover {
+  background-color: white;
+  transition: background-color 0.2s ease-in;
+}
+
+.new_sheet .new_sheet_btn {
+  background-color: transparent;
+  border: none;
+}

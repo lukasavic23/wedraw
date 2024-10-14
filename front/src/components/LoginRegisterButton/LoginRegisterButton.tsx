@@ -1,5 +1,6 @@
 import { ComponentProps } from "react";
 import styles from "./LoginRegisterButton.module.css";
+import classNames from "classnames";
 
 interface LoginRegisterButtonProps extends ComponentProps<"button"> {
   text: string;
@@ -11,7 +12,7 @@ const LoginRegisterButton = (props: LoginRegisterButtonProps) => {
 
   return (
     <button
-      className={`${styles.button} ${className ?? ""}`}
+      className={classNames(styles.button, className ?? "")}
       disabled={disabled}
       onClick={onClick}
       {...restProps}

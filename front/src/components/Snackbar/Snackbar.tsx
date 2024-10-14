@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import { SnackbarSeverity } from "../../interfaces/Snackbar";
 import styles from "./Snackbar.module.css";
 
@@ -18,7 +19,7 @@ const Snackbar = (props: SnackbarProps) => {
   };
 
   return (
-    <div className={`${styles.snackbar} ${getSnackbarClass()}`}>
+    <div className={classNames(styles.snackbar, getSnackbarClass())}>
       <p className={styles.text}>{props.message}</p>
       <button type="button" onClick={props.onCloseSnackbar}>
         X

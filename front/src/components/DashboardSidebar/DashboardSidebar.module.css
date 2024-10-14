@@ -1,0 +1,16 @@
+.sidebar {
+  flex-shrink: 0;
+  width: 300px;
+  height: 100%;
+  background-color: #d73232;
+}
+
+.sidebar .sidebar_header {
+  padding: 20px;
+  color: #fff3f3;
+  font-style: italic;
+}
+
+.sidebar .sidebar_content {
+  padding-inline: 20px;
+}
