@@ -30,7 +30,7 @@ const PersistentLogin = ({ isGuestRoute }: PersistentLoginProps) => {
 
   if (isGuestRoute) {
     if (auth?.accessToken && !isFetching) {
-      return <Navigate to={URLRoutes.Welcome} />;
+      return <Navigate to={URLRoutes.Dashboard} />;
     } else if (isFetching) {
       return <p>loading..</p>;
     } else {

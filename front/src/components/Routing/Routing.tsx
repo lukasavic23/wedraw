@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { URLRoutes } from "../../enums/Routes";
 import Login from "../../containers/Login/Login";
 import ProtectedRoute from "./ProtectedRoute";
-import Welcome from "../../containers/Dashboard/Dashboard";
+import Dashboard from "../../containers/Dashboard/Dashboard";
 import PersistentLogin from "./PersistentLogin";
 import Register from "../../containers/Register/Register";
 
@@ -11,7 +11,7 @@ const guestRoutes = [
   { path: URLRoutes.Register, component: <Register /> },
 ];
 
-const secureRoutes = [{ path: URLRoutes.Welcome, component: <Welcome /> }];
+const secureRoutes = [{ path: URLRoutes.Dashboard, component: <Dashboard /> }];
 
 const Routing = () => {
   return (

@@ -35,7 +35,7 @@ const Login = () => {
 
     AuthenticationService.login({ email, password })
       .then((response) => {
-        navigate(URLRoutes.Welcome);
+        navigate(URLRoutes.Dashboard);
         setAuth(response.data.data);
       })
       .catch((err) => {

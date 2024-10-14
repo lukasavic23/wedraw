@@ -126,7 +126,7 @@ const Register = () => {
       passwordConfirm: formValues.confirmPassword,
     })
       .then((response) => {
-        navigate(URLRoutes.Welcome);
+        navigate(URLRoutes.Dashboard);
         setAuth(response.data.data);
       })
       .catch((err) => {

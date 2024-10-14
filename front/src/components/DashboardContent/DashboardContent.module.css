@@ -1,0 +1,12 @@
+.content {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.canvas_wrapper {
+  height: calc(100% - 35px);
+}
+
+canvas {
+  border: 1px solid black;
+}

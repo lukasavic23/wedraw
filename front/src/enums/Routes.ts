@@ -1,5 +1,5 @@
 export enum URLRoutes {
   Empty = "/",
   Register = "/register",
-  Welcome = "/welcome",
+  Dashboard = "/dashboard",
 }
