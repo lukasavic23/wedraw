@@ -7,6 +7,12 @@
   height: calc(100% - 35px);
 }
 
+.header_wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 canvas {
   border: 1px solid black;
 }

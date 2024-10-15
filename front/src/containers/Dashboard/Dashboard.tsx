@@ -14,7 +14,7 @@ const Dashboard = () => {
       <section className={styles.dashboard_content}>
         <DashboradHeader />
         {selectedSheet ? (
-          <DashboardContent selectedSheet={selectedSheet} />
+          <DashboardContent sheet={selectedSheet} />
         ) : (
           <p className={styles.empty_sheet_msg}>
             Select existing sheets or add new one to create new drawing.
