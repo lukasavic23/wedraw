@@ -9,7 +9,7 @@ interface PersistentLoginProps {
 }
 
 const PersistentLogin = ({ isGuestRoute }: PersistentLoginProps) => {
-  const { auth } = useAuthContext();
+  const { auth, setAuth } = useAuthContext();
   const { handleRefreshToken, isFetching } = useRefreshToken();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -17,7 +17,7 @@ const PersistentLogin = ({ isGuestRoute }: PersistentLoginProps) => {
   useLayoutEffect(() => {
     const verifyRefreshToken = () => {
       handleRefreshToken()
-        .catch((err) => console.log(err))
+        .catch(() => setAuth(null))
         .finally(() => setIsLoading(false));
     };
 
@@ -26,7 +26,7 @@ const PersistentLogin = ({ isGuestRoute }: PersistentLoginProps) => {
     } else {
       verifyRefreshToken();
     }
-  }, [auth?.accessToken, handleRefreshToken]);
+  }, [auth?.accessToken, handleRefreshToken, setAuth]);
 
   if (isGuestRoute) {
     if (auth?.accessToken && !isFetching) {

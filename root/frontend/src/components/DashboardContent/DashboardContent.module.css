@@ -4,15 +4,28 @@
 }
 
 .canvas_wrapper {
-  height: calc(100% - 35px);
+  height: calc(100% - 45px);
 }
 
 .header_wrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding-bottom: 5px;
 }
 
 canvas {
   border: 1px solid black;
+}
+
+.save_btn {
+  padding: 10px 15px;
+  background-color: #327ad7;
+  border: none;
+  border-radius: 25px;
+  color: white;
+}
+
+.save_btn:disabled {
+  opacity: 0.5;
 }

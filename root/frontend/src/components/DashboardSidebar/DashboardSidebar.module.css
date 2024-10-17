@@ -19,6 +19,6 @@
   padding-top: 10px;
 }
 
-.sidebar .sidebar_content .existing_sheets :not(:last-child) {
+.sidebar .sidebar_content .existing_sheets > :not(:last-child) {
   margin-bottom: 10px;
 }

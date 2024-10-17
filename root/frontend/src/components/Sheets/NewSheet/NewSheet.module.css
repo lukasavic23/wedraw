@@ -37,6 +37,8 @@
   border-bottom-left-radius: 8px;
   outline: none;
   border: 1px solid #bebebe;
+  background-color: white;
+  z-index: 2;
 }
 
 .input_modal form button {

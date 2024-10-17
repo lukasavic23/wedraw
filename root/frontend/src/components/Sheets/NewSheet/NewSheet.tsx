@@ -43,7 +43,7 @@ const NewSheet = () => {
     const newSheet = { id: uuidv4(), name: sheetName };
     setSheets((prevSheets) => [...prevSheets, newSheet]);
     setSelectedSheetId(newSheet.id);
-    setOpenInput(false);
+    closeInput();
   };
 
   const handleChangeNewSheetName = (e: React.ChangeEvent<HTMLInputElement>) => {

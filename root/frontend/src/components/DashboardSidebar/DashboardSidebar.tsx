@@ -1,11 +1,12 @@
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import NewSheet from "../Sheets/NewSheet/NewSheet";
 import styles from "./DashboardSidebar.module.css";
-import { sheetsAtom } from "../../atoms/sheets";
+import { selectedSheetIdAtom, sheetsAtom } from "../../atoms/sheets";
 import ExistingSheet from "../Sheets/ExistingSheet/ExistingSheet";
 
 const DashboardSidebar = () => {
   const sheets = useAtomValue(sheetsAtom);
+  const setSelectedSheetId = useSetAtom(selectedSheetIdAtom);
 
   return (
     <section className={styles.sidebar}>
@@ -14,7 +15,11 @@ const DashboardSidebar = () => {
         <NewSheet />
         <div className={styles.existing_sheets}>
           {sheets.map((sheet) => (
-            <ExistingSheet key={sheet.id} />
+            <ExistingSheet
+              key={sheet.id}
+              sheet={sheet}
+              onClick={() => setSelectedSheetId(sheet.id)}
+            />
           ))}
         </div>
       </section>
