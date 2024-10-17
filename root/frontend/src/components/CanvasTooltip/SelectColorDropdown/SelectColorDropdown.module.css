@@ -1,0 +1,36 @@
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  padding: 15px 20px;
+  background-color: white;
+  border-radius: 4px;
+  border: 1px solid #bebebe;
+}
+
+.base_colors {
+  display: grid;
+  align-items: center;
+  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.color_circle_wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #a5a5a5;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+.color_circle_wrapper.selected {
+  border: 2px solid black;
+}
+
+.color_circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}

@@ -5,6 +5,7 @@ import { getMousePosition } from "../../helpers/canvasHelper";
 import { useSetAtom } from "jotai";
 import { sheetsAtom } from "../../atoms/sheets";
 import iconPencil from "../../assets/icon_pencil.svg";
+import CanvasTooltip from "../CanvasTooltip/CanvasTooltip";
 
 interface DashboardContentProps {
   sheet: ISheet;
@@ -14,6 +15,12 @@ interface Point {
   x: number;
   y: number;
 }
+
+const beginDrawing = (ctx: CanvasRenderingContext2D, point: Point) => {
+  ctx.fillStyle = "black";
+  ctx.fillRect(point.x, point.y, 2, 2);
+  ctx.beginPath();
+};
 
 const draw = (ctx: CanvasRenderingContext2D, point: Point) => {
   ctx.lineWidth = 1;
@@ -27,6 +34,9 @@ const DashboardContent = (props: DashboardContentProps) => {
 
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
   const [isSaveDisabled, setIsSaveDisabled] = useState<boolean>(true);
+  const [isClearDisabled, setIsClearDisabled] = useState<boolean>(
+    !sheet.drawing
+  );
 
   const setSheets = useSetAtom(sheetsAtom);
 
@@ -82,10 +92,11 @@ const DashboardContent = (props: DashboardContentProps) => {
     const onMouseDown = (e: MouseEvent) => {
       setIsDrawing(true);
       setIsSaveDisabled((prev) => (prev ? false : prev));
+      setIsClearDisabled((prev) => (prev ? false : prev));
       canvas.style.cursor = `url(${iconPencil}), auto`;
 
       const { mouseX, mouseY } = getMousePosition(e, canvas);
-      draw(context, { x: mouseX, y: mouseY });
+      beginDrawing(context, { x: mouseX, y: mouseY });
     };
 
     const onMouseMove = (e: MouseEvent) => {
@@ -99,8 +110,6 @@ const DashboardContent = (props: DashboardContentProps) => {
     const onMouseUp = () => {
       canvas.style.cursor = "auto";
       setIsDrawing(false);
-
-      context.beginPath();
     };
 
     canvas.addEventListener("mousedown", onMouseDown);
@@ -114,35 +123,56 @@ const DashboardContent = (props: DashboardContentProps) => {
     };
   }, [isDrawing]);
 
+  const handleClearCanvas = () => {
+    canvasRef.current
+      ?.getContext("2d")
+      ?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+
+    setIsClearDisabled(true);
+  };
+
   const handleSaveCanvas = () => {
-    const canvas = canvasRef.current;
+    const drawing = canvasRef.current?.toDataURL();
 
     setSheets((prevSheets) =>
       prevSheets.map((prevSheet) => {
         if (prevSheet.id === sheet.id) {
-          return { ...prevSheet, drawing: canvas?.toDataURL() };
+          return { ...prevSheet, drawing };
         }
 
         return prevSheet;
       })
     );
+    setIsSaveDisabled(true);
   };
 
   return (
     <section className={styles.content}>
       <div className={styles.header_wrapper}>
         <h2>{sheet.name}</h2>
-        <button
-          disabled={isSaveDisabled}
-          className={styles.save_btn}
-          onClick={handleSaveCanvas}
-        >
-          Save
-        </button>
+        <div className={styles.ctrl_buttons}>
+          <button
+            disabled={isClearDisabled}
+            className={styles.clear_btn}
+            onClick={handleClearCanvas}
+          >
+            Clear
+          </button>
+          <button
+            disabled={isSaveDisabled}
+            className={styles.save_btn}
+            onClick={handleSaveCanvas}
+          >
+            Save
+          </button>
+        </div>
       </div>
-      <div className={styles.canvas_wrapper} ref={canvasParentRef}>
-        <canvas ref={canvasRef}></canvas>
-      </div>
+      <section className={styles.canvas_container}>
+        <CanvasTooltip />
+        <div className={styles.canvas_wrapper} ref={canvasParentRef}>
+          <canvas ref={canvasRef}></canvas>
+        </div>
+      </section>
     </section>
   );
 };

@@ -1,0 +1,28 @@
+.tooltip {
+  height: 50px;
+  background-color: #60a2f7;
+  padding: 0 20px;
+}
+
+.colors_wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+}
+
+.colors_indicator {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  color: white;
+}
+
+.selected_color {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid white;
+  cursor: pointer;
+}

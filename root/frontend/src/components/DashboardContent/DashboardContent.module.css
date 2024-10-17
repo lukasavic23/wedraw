@@ -3,10 +3,6 @@
   padding: 20px;
 }
 
-.canvas_wrapper {
-  height: calc(100% - 45px);
-}
-
 .header_wrapper {
   display: flex;
   align-items: center;
@@ -14,18 +10,41 @@
   padding-bottom: 5px;
 }
 
+.canvas_container {
+  height: calc(100% - 95px);
+}
+
+.canvas_wrapper {
+  height: 100%;
+}
+
 canvas {
   border: 1px solid black;
 }
 
+.ctrl_buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.clear_btn,
 .save_btn {
   padding: 10px 15px;
-  background-color: #327ad7;
   border: none;
   border-radius: 25px;
   color: white;
 }
 
+.clear_btn:disabled,
 .save_btn:disabled {
   opacity: 0.5;
+}
+
+.clear_btn {
+  background-color: rgb(175, 20, 20);
+}
+
+.save_btn {
+  background-color: #327ad7;
 }

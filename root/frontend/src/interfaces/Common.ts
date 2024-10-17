@@ -6,3 +6,5 @@ interface Response<T> {
 }
 
 export type AxiosResponseType<T> = Promise<AxiosResponse<Response<T>>>;
+
+export type HexColor = `#${string}`;
