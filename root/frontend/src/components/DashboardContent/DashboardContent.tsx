@@ -4,9 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getMousePosition } from "../../helpers/canvasHelper";
 import { useSetAtom } from "jotai";
 import { sheetsAtom } from "../../atoms/sheets";
-import iconPencil from "../../assets/icon_pencil.svg";
 import CanvasTooltip from "../CanvasTooltip/CanvasTooltip";
 import { CanvasHexColors } from "../../enums/Canvas";
+import { HexColor } from "../../types/Common";
 
 interface DashboardContentProps {
   sheet: ISheet;
@@ -15,6 +15,13 @@ interface DashboardContentProps {
 interface Point {
   x: number;
   y: number;
+}
+
+interface Cursor {
+  color: HexColor;
+  size: number;
+  canvas: HTMLCanvasElement;
+  cursorUrl: string | null;
 }
 
 const DashboardContent = (props: DashboardContentProps) => {
@@ -36,6 +43,12 @@ const DashboardContent = (props: DashboardContentProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const activeAction = useRef<"pencil" | "eraser" | null>(null);
   const oldMousePoint = useRef<Point>({ x: 0, y: 0 });
+  const cursorStyle = useRef<Cursor>({
+    color: CanvasHexColors.Black,
+    size: 1,
+    cursorUrl: null,
+    canvas: document.createElement("canvas"),
+  });
 
   const scaleCanvas = useCallback((canvas: HTMLCanvasElement) => {
     if (!canvasParentRef.current) return;
@@ -71,9 +84,23 @@ const DashboardContent = (props: DashboardContentProps) => {
     [tools.size, tools.color]
   );
 
+  const beginErasing = useCallback(
+    (ctx: CanvasRenderingContext2D, point: Point) => {
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.beginPath();
+      ctx.rect(
+        point.x - tools.size / 2,
+        point.y - tools.size / 2,
+        tools.size,
+        tools.size
+      );
+      ctx.fill();
+    },
+    [tools.size]
+  );
+
   const erase = useCallback(
     (ctx: CanvasRenderingContext2D, point: Point, old: Point) => {
-      ctx.globalCompositeOperation = "destination-out";
       ctx.beginPath();
       ctx.rect(
         point.x - tools.size / 2,
@@ -90,6 +117,50 @@ const DashboardContent = (props: DashboardContentProps) => {
     },
     [tools.size]
   );
+
+  const updateCursor = useCallback(() => {
+    const size = tools.size;
+
+    cursorStyle.current.size = size;
+    cursorStyle.current.color = tools.color;
+
+    const cursorCanvas = cursorStyle.current.canvas;
+    const cursorContext = cursorCanvas.getContext("2d");
+    if (!cursorContext) return;
+
+    cursorCanvas.width = cursorCanvas.height = size;
+
+    if (tools.activeTool === "pencil") {
+      cursorContext.fillStyle = tools.color;
+      cursorContext.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+      cursorContext.fill();
+    } else {
+      cursorContext.fillStyle = "white";
+      cursorContext.fillRect(0, 0, size, size);
+      cursorContext.strokeStyle = "black";
+      cursorContext.lineWidth = 1;
+      cursorContext.strokeRect(0, 0, size, size);
+    }
+
+    cursorCanvas.toBlob((blob) => {
+      if (!blob) return;
+
+      if (cursorStyle.current.cursorUrl)
+        URL.revokeObjectURL(cursorStyle.current.cursorUrl);
+
+      cursorStyle.current.cursorUrl = URL.createObjectURL(blob);
+
+      if (canvasRef.current)
+        canvasRef.current.style.cursor = `url(${
+          cursorStyle.current.cursorUrl
+        }) ${size / 2} ${size / 2}, auto`;
+    });
+  }, [tools.activeTool, tools.color, tools.size]);
+
+  // update cursor according to tool used
+  useEffect(() => {
+    updateCursor();
+  }, [updateCursor]);
 
   // set canvas dimensions
   useEffect(() => {
@@ -133,7 +204,6 @@ const DashboardContent = (props: DashboardContentProps) => {
       if (tools.activeTool === "pencil") {
         const { mouseX, mouseY } = getMousePosition(e, canvas);
         activeAction.current = "pencil";
-        canvas.style.cursor = `url(${iconPencil}), auto`;
 
         beginDrawing(context, { x: mouseX, y: mouseY });
         oldMousePoint.current = {
@@ -143,6 +213,8 @@ const DashboardContent = (props: DashboardContentProps) => {
       } else if (tools.activeTool === "eraser") {
         const { mouseX, mouseY } = getMousePosition(e, canvas);
         activeAction.current = "eraser";
+
+        beginErasing(context, { x: mouseX, y: mouseY });
         oldMousePoint.current = {
           x: mouseX,
           y: mouseY,
@@ -179,7 +251,6 @@ const DashboardContent = (props: DashboardContentProps) => {
     };
 
     const onMouseUp = () => {
-      canvas.style.cursor = "auto";
       activeAction.current = null;
     };
 
