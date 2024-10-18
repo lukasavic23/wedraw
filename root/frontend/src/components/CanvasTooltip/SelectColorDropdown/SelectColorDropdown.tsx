@@ -1,22 +1,14 @@
 import classNames from "classnames";
-import { HexColor } from "../../../interfaces/Common";
+import { HexColor } from "../../../types/Common";
 import styles from "./SelectColorDropdown.module.css";
+import { CanvasHexColors } from "../../../enums/Canvas";
 
 interface SelectColorDropdownProps {
   selectedColor: HexColor;
   onSelectColor: (color: HexColor) => void;
 }
 
-const BASE_COLORS: HexColor[] = [
-  "#000000",
-  "#808080",
-  "#0000ff",
-  "#ffff00",
-  "#ff0000",
-  "#ffa500",
-  "#008000",
-  "#800080",
-];
+const BASE_COLORS = Object.values(CanvasHexColors);
 
 const SelectColorDropdown = (props: SelectColorDropdownProps) => {
   const { selectedColor, onSelectColor } = props;
@@ -26,6 +18,7 @@ const SelectColorDropdown = (props: SelectColorDropdownProps) => {
       <div className={styles.base_colors}>
         {BASE_COLORS.map((color) => (
           <div
+            key={color}
             className={classNames(
               styles.color_circle_wrapper,
               selectedColor === color ? styles.selected : ""
@@ -33,7 +26,6 @@ const SelectColorDropdown = (props: SelectColorDropdownProps) => {
             onClick={() => onSelectColor(color)}
           >
             <div
-              key={color}
               className={styles.color_circle}
               style={{ backgroundColor: color }}
             ></div>

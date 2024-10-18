@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { SnackbarState, SnackbarSeverity } from "../interfaces/Snackbar";
+import { SnackbarState, SnackbarSeverity } from "../types/Snackbar";
 
 const useSnackbar = () => {
   const [snackbar, setSnackbar] = useState<SnackbarState>({ open: false });

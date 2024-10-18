@@ -1,11 +1,12 @@
 import styles from "./DashboardContent.module.css";
-import { ISheet } from "../../interfaces/Sheet";
+import { CanvasTools, ISheet } from "../../types/Sheet";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getMousePosition } from "../../helpers/canvasHelper";
 import { useSetAtom } from "jotai";
 import { sheetsAtom } from "../../atoms/sheets";
 import iconPencil from "../../assets/icon_pencil.svg";
 import CanvasTooltip from "../CanvasTooltip/CanvasTooltip";
+import { CanvasHexColors } from "../../enums/Canvas";
 
 interface DashboardContentProps {
   sheet: ISheet;
@@ -16,23 +17,14 @@ interface Point {
   y: number;
 }
 
-const beginDrawing = (ctx: CanvasRenderingContext2D, point: Point) => {
-  ctx.fillStyle = "black";
-  ctx.fillRect(point.x, point.y, 2, 2);
-  ctx.beginPath();
-};
-
-const draw = (ctx: CanvasRenderingContext2D, point: Point) => {
-  ctx.lineWidth = 1;
-  ctx.strokeStyle = "black";
-  ctx.lineTo(point.x, point.y);
-  ctx.stroke();
-};
-
 const DashboardContent = (props: DashboardContentProps) => {
   const { sheet } = props;
 
-  const [isDrawing, setIsDrawing] = useState<boolean>(false);
+  const [tools, setTools] = useState<CanvasTools>({
+    activeTool: "pencil",
+    color: CanvasHexColors.Black,
+    size: 1,
+  });
   const [isSaveDisabled, setIsSaveDisabled] = useState<boolean>(true);
   const [isClearDisabled, setIsClearDisabled] = useState<boolean>(
     !sheet.drawing
@@ -42,6 +34,7 @@ const DashboardContent = (props: DashboardContentProps) => {
 
   const canvasParentRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isDrawing = useRef<boolean>(false);
 
   const scaleCanvas = useCallback((canvas: HTMLCanvasElement) => {
     if (!canvasParentRef.current) return;
@@ -52,6 +45,25 @@ const DashboardContent = (props: DashboardContentProps) => {
     canvas.style.height = `${dimensions.height}px`;
     canvas.style.width = `${dimensions.width}px`;
   }, []);
+
+  const beginDrawing = useCallback(
+    (ctx: CanvasRenderingContext2D, point: Point) => {
+      ctx.fillStyle = tools.color;
+      ctx.fillRect(point.x, point.y, 2, 2);
+      ctx.beginPath();
+    },
+    [tools.color]
+  );
+
+  const draw = useCallback(
+    (ctx: CanvasRenderingContext2D, point: Point) => {
+      ctx.lineWidth = tools.size;
+      ctx.strokeStyle = tools.color;
+      ctx.lineTo(point.x, point.y);
+      ctx.stroke();
+    },
+    [tools.size, tools.color]
+  );
 
   // set canvas dimensions
   useEffect(() => {
@@ -72,9 +84,8 @@ const DashboardContent = (props: DashboardContentProps) => {
     if (!sheet.drawing) return;
 
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    const context = canvas.getContext("2d");
-    if (!context) return;
+    const context = canvas?.getContext("2d");
+    if (!canvas || !context) return;
 
     const image = new Image();
     image.src = sheet.drawing;
@@ -90,7 +101,7 @@ const DashboardContent = (props: DashboardContentProps) => {
     if (!context) return;
 
     const onMouseDown = (e: MouseEvent) => {
-      setIsDrawing(true);
+      isDrawing.current = true;
       setIsSaveDisabled((prev) => (prev ? false : prev));
       setIsClearDisabled((prev) => (prev ? false : prev));
       canvas.style.cursor = `url(${iconPencil}), auto`;
@@ -100,7 +111,7 @@ const DashboardContent = (props: DashboardContentProps) => {
     };
 
     const onMouseMove = (e: MouseEvent) => {
-      if (isDrawing) {
+      if (isDrawing.current) {
         const { mouseX, mouseY } = getMousePosition(e, canvas);
 
         draw(context, { x: mouseX, y: mouseY });
@@ -109,7 +120,7 @@ const DashboardContent = (props: DashboardContentProps) => {
 
     const onMouseUp = () => {
       canvas.style.cursor = "auto";
-      setIsDrawing(false);
+      isDrawing.current = false;
     };
 
     canvas.addEventListener("mousedown", onMouseDown);
@@ -121,7 +132,7 @@ const DashboardContent = (props: DashboardContentProps) => {
       canvas.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
     };
-  }, [isDrawing]);
+  }, [beginDrawing, draw]);
 
   const handleClearCanvas = () => {
     canvasRef.current
@@ -129,6 +140,7 @@ const DashboardContent = (props: DashboardContentProps) => {
       ?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
     setIsClearDisabled(true);
+    setIsSaveDisabled(false);
   };
 
   const handleSaveCanvas = () => {
@@ -168,7 +180,7 @@ const DashboardContent = (props: DashboardContentProps) => {
         </div>
       </div>
       <section className={styles.canvas_container}>
-        <CanvasTooltip />
+        <CanvasTooltip tools={tools} setTools={setTools} />
         <div className={styles.canvas_wrapper} ref={canvasParentRef}>
           <canvas ref={canvasRef}></canvas>
         </div>

@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { SnackbarSeverity } from "../../interfaces/Snackbar";
+import { SnackbarSeverity } from "../../types/Snackbar";
 import styles from "./Snackbar.module.css";
 
 interface SnackbarProps {

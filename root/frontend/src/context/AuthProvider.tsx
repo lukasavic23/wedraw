@@ -1,5 +1,5 @@
 import { createContext, useState, ReactNode, useMemo, useContext } from "react";
-import { AuthenticationResponse } from "../interfaces/Login";
+import { AuthenticationResponse } from "../types/Login";
 
 type Auth = AuthenticationResponse;
 

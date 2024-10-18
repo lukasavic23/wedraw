@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { ISheet } from "../interfaces/Sheet";
+import { ISheet } from "../types/Sheet";
 
 export const sheetsAtom = atom<ISheet[]>([]);
 export const selectedSheetIdAtom = atom<ISheet["id"] | null>(null);

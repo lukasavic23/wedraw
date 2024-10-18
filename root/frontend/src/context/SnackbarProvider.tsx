@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useContext, useMemo } from "react";
 import useSnackbar from "../hooks/useSnackbar";
-import { SnackbarState, SnackbarSeverity } from "../interfaces/Snackbar";
+import { SnackbarState, SnackbarSeverity } from "../types/Snackbar";
 import Snackbar from "../components/Snackbar/Snackbar";
 
 interface SnackbarProviderArgs {

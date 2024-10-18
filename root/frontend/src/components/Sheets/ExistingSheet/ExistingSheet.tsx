@@ -1,4 +1,4 @@
-import { ISheet } from "../../../interfaces/Sheet";
+import { ISheet } from "../../../types/Sheet";
 import styles from "./ExistingSheet.module.css";
 
 interface ExistingSheetProps {

@@ -1,10 +1,10 @@
 import axios from "../../config/axios";
-import { AxiosResponseType } from "../interfaces/Common";
+import { AxiosResponseType } from "../types/Common";
 import {
   LoginPayload,
   AuthenticationResponse,
   RegisterPayload,
-} from "../interfaces/Login";
+} from "../types/Login";
 
 class AuthenticationService {
   static login = function (

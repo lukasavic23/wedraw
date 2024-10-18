@@ -1,14 +1,28 @@
 .tooltip {
+  display: flex;
   height: 50px;
   background-color: #60a2f7;
-  padding: 0 20px;
 }
 
+.tools_wrapper,
 .colors_wrapper {
   display: flex;
   align-items: center;
   gap: 10px;
-  height: 100%;
+  border-right: 1px solid #fcfcfc;
+  padding: 0 20px;
+}
+
+.tool_btn {
+  background-color: transparent;
+  border: none;
+  border: 1px solid transparent;
+  padding: 3px 5px;
+}
+
+.active_tool {
+  border: 1px solid #fcfcfc;
+  border-radius: 8px;
 }
 
 .colors_indicator {
