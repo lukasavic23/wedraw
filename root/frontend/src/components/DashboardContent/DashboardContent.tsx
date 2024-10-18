@@ -34,7 +34,8 @@ const DashboardContent = (props: DashboardContentProps) => {
 
   const canvasParentRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const isDrawing = useRef<boolean>(false);
+  const activeAction = useRef<"pencil" | "eraser" | null>(null);
+  const oldMousePoint = useRef<Point>({ x: 0, y: 0 });
 
   const scaleCanvas = useCallback((canvas: HTMLCanvasElement) => {
     if (!canvasParentRef.current) return;
@@ -48,21 +49,46 @@ const DashboardContent = (props: DashboardContentProps) => {
 
   const beginDrawing = useCallback(
     (ctx: CanvasRenderingContext2D, point: Point) => {
+      ctx.beginPath();
+      ctx.globalCompositeOperation = "source-over";
       ctx.fillStyle = tools.color;
-      ctx.fillRect(point.x, point.y, 2, 2);
+      ctx.arc(point.x, point.y, tools.size / 2, 0, 2 * Math.PI, false);
+      ctx.fill();
       ctx.beginPath();
     },
-    [tools.color]
+    [tools.color, tools.size]
   );
 
   const draw = useCallback(
-    (ctx: CanvasRenderingContext2D, point: Point) => {
+    (ctx: CanvasRenderingContext2D, point: Point, old: Point) => {
       ctx.lineWidth = tools.size;
       ctx.strokeStyle = tools.color;
+      ctx.lineCap = "round";
+      ctx.moveTo(old.x, old.y);
       ctx.lineTo(point.x, point.y);
       ctx.stroke();
     },
     [tools.size, tools.color]
+  );
+
+  const erase = useCallback(
+    (ctx: CanvasRenderingContext2D, point: Point, old: Point) => {
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.beginPath();
+      ctx.rect(
+        point.x - tools.size / 2,
+        point.y - tools.size / 2,
+        tools.size,
+        tools.size
+      );
+      ctx.fill();
+      ctx.lineWidth = tools.size;
+      ctx.beginPath();
+      ctx.moveTo(old.x, old.y);
+      ctx.lineTo(point.x, point.y);
+      ctx.stroke();
+    },
+    [tools.size]
   );
 
   // set canvas dimensions
@@ -101,26 +127,60 @@ const DashboardContent = (props: DashboardContentProps) => {
     if (!context) return;
 
     const onMouseDown = (e: MouseEvent) => {
-      isDrawing.current = true;
       setIsSaveDisabled((prev) => (prev ? false : prev));
       setIsClearDisabled((prev) => (prev ? false : prev));
-      canvas.style.cursor = `url(${iconPencil}), auto`;
 
-      const { mouseX, mouseY } = getMousePosition(e, canvas);
-      beginDrawing(context, { x: mouseX, y: mouseY });
+      if (tools.activeTool === "pencil") {
+        const { mouseX, mouseY } = getMousePosition(e, canvas);
+        activeAction.current = "pencil";
+        canvas.style.cursor = `url(${iconPencil}), auto`;
+
+        beginDrawing(context, { x: mouseX, y: mouseY });
+        oldMousePoint.current = {
+          x: mouseX,
+          y: mouseY,
+        };
+      } else if (tools.activeTool === "eraser") {
+        const { mouseX, mouseY } = getMousePosition(e, canvas);
+        activeAction.current = "eraser";
+        oldMousePoint.current = {
+          x: mouseX,
+          y: mouseY,
+        };
+      }
     };
 
     const onMouseMove = (e: MouseEvent) => {
-      if (isDrawing.current) {
+      if (activeAction.current === "pencil") {
         const { mouseX, mouseY } = getMousePosition(e, canvas);
 
-        draw(context, { x: mouseX, y: mouseY });
+        draw(
+          context,
+          { x: mouseX, y: mouseY },
+          { x: oldMousePoint.current.x, y: oldMousePoint.current.y }
+        );
+        oldMousePoint.current = {
+          x: mouseX,
+          y: mouseY,
+        };
+      } else if (activeAction.current === "eraser") {
+        const { mouseX, mouseY } = getMousePosition(e, canvas);
+
+        erase(
+          context,
+          { x: mouseX, y: mouseY },
+          { x: oldMousePoint.current.x, y: oldMousePoint.current.y }
+        );
+        oldMousePoint.current = {
+          x: mouseX,
+          y: mouseY,
+        };
       }
     };
 
     const onMouseUp = () => {
       canvas.style.cursor = "auto";
-      isDrawing.current = false;
+      activeAction.current = null;
     };
 
     canvas.addEventListener("mousedown", onMouseDown);
@@ -132,7 +192,7 @@ const DashboardContent = (props: DashboardContentProps) => {
       canvas.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
     };
-  }, [beginDrawing, draw]);
+  }, [beginDrawing, draw, erase, tools.activeTool]);
 
   const handleClearCanvas = () => {
     canvasRef.current

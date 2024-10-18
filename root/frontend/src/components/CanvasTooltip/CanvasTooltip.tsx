@@ -1,4 +1,3 @@
-import ColorLensIcon from "@mui/icons-material/ColorLens";
 import styles from "./CanvasTooltip.module.css";
 import { Dispatch, useState } from "react";
 import SelectColorDropdown from "./SelectColorDropdown/SelectColorDropdown";
@@ -26,7 +25,11 @@ const CanvasTooltip = ({ tools, setTools }: CanvasTooltipProps) => {
   };
 
   const handleChangeActiveTool = (tool: CanvasTools["activeTool"]) => {
-    setTools((prevTools) => ({ ...prevTools, activeTool: tool }));
+    setTools((prevTools) => ({ ...prevTools, activeTool: tool, size: 1 }));
+  };
+
+  const handleChangeToolSize = (size: number) => {
+    setTools((prevTools) => ({ ...prevTools, size }));
   };
 
   return (
@@ -65,7 +68,6 @@ const CanvasTooltip = ({ tools, setTools }: CanvasTooltipProps) => {
       </div>
       <div className={styles.colors_wrapper}>
         <div className={styles.colors_indicator}>
-          <ColorLensIcon sx={{ color: "white" }} fontSize="small" />
           <p>Color</p>
         </div>
         <div
@@ -81,6 +83,17 @@ const CanvasTooltip = ({ tools, setTools }: CanvasTooltipProps) => {
             />
           )}
         </div>
+      </div>
+      <div className={styles.size_wrapper}>
+        <p>Size</p>
+        <input
+          type="range"
+          min={1}
+          max={100}
+          value={tools.size}
+          onChange={(e) => handleChangeToolSize(+e.target.value)}
+        />
+        <p>{tools.size}</p>
       </div>
     </div>
   );

@@ -5,12 +5,19 @@
 }
 
 .tools_wrapper,
-.colors_wrapper {
+.colors_wrapper,
+.size_wrapper {
   display: flex;
   align-items: center;
   gap: 10px;
   border-right: 1px solid #fcfcfc;
   padding: 0 20px;
+}
+
+.size_wrapper {
+  border-right: none;
+  color: white;
+  font-size: 14px;
 }
 
 .tool_btn {
