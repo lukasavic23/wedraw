@@ -24,14 +24,16 @@ interface Cursor {
   cursorUrl: string | null;
 }
 
+const INIT_TOOLS: CanvasTools = {
+  activeTool: "pencil",
+  pencil: { color: CanvasHexColors.Black, size: 1 },
+  eraser: { size: 1 },
+};
+
 const DashboardContent = (props: DashboardContentProps) => {
   const { sheet } = props;
 
-  const [tools, setTools] = useState<CanvasTools>({
-    activeTool: "pencil",
-    color: CanvasHexColors.Black,
-    size: 1,
-  });
+  const [tools, setTools] = useState<CanvasTools>(INIT_TOOLS);
   const [isSaveDisabled, setIsSaveDisabled] = useState<boolean>(true);
   const [isClearDisabled, setIsClearDisabled] = useState<boolean>(
     !sheet.drawing
@@ -64,24 +66,24 @@ const DashboardContent = (props: DashboardContentProps) => {
     (ctx: CanvasRenderingContext2D, point: Point) => {
       ctx.beginPath();
       ctx.globalCompositeOperation = "source-over";
-      ctx.fillStyle = tools.color;
-      ctx.arc(point.x, point.y, tools.size / 2, 0, 2 * Math.PI, false);
+      ctx.fillStyle = tools.pencil.color;
+      ctx.arc(point.x, point.y, tools.pencil.size / 2, 0, 2 * Math.PI, false);
       ctx.fill();
       ctx.beginPath();
     },
-    [tools.color, tools.size]
+    [tools.pencil.color, tools.pencil.size]
   );
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D, point: Point, old: Point) => {
-      ctx.lineWidth = tools.size;
-      ctx.strokeStyle = tools.color;
+      ctx.lineWidth = tools.pencil.size;
+      ctx.strokeStyle = tools.pencil.color;
       ctx.lineCap = "round";
       ctx.moveTo(old.x, old.y);
       ctx.lineTo(point.x, point.y);
       ctx.stroke();
     },
-    [tools.size, tools.color]
+    [tools.pencil.size, tools.pencil.color]
   );
 
   const beginErasing = useCallback(
@@ -89,40 +91,42 @@ const DashboardContent = (props: DashboardContentProps) => {
       ctx.globalCompositeOperation = "destination-out";
       ctx.beginPath();
       ctx.rect(
-        point.x - tools.size / 2,
-        point.y - tools.size / 2,
-        tools.size,
-        tools.size
+        point.x - tools.eraser.size / 2,
+        point.y - tools.eraser.size / 2,
+        tools.eraser.size,
+        tools.eraser.size
       );
       ctx.fill();
     },
-    [tools.size]
+    [tools.eraser.size]
   );
 
   const erase = useCallback(
     (ctx: CanvasRenderingContext2D, point: Point, old: Point) => {
       ctx.beginPath();
       ctx.rect(
-        point.x - tools.size / 2,
-        point.y - tools.size / 2,
-        tools.size,
-        tools.size
+        point.x - tools.eraser.size / 2,
+        point.y - tools.eraser.size / 2,
+        tools.eraser.size,
+        tools.eraser.size
       );
       ctx.fill();
-      ctx.lineWidth = tools.size;
+      ctx.lineWidth = tools.eraser.size;
       ctx.beginPath();
       ctx.moveTo(old.x, old.y);
       ctx.lineTo(point.x, point.y);
       ctx.stroke();
     },
-    [tools.size]
+    [tools.eraser.size]
   );
 
   const updateCursor = useCallback(() => {
-    const size = tools.size;
+    const size =
+      tools.activeTool === "pencil" ? tools.pencil.size : tools.eraser.size;
+    const color = tools.activeTool === "pencil" ? tools.pencil.color : "#fff";
 
     cursorStyle.current.size = size;
-    cursorStyle.current.color = tools.color;
+    cursorStyle.current.color = color;
 
     const cursorCanvas = cursorStyle.current.canvas;
     const cursorContext = cursorCanvas.getContext("2d");
@@ -131,7 +135,7 @@ const DashboardContent = (props: DashboardContentProps) => {
     cursorCanvas.width = cursorCanvas.height = size;
 
     if (tools.activeTool === "pencil") {
-      cursorContext.fillStyle = tools.color;
+      cursorContext.fillStyle = tools.pencil.color;
       cursorContext.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
       cursorContext.fill();
     } else {
@@ -155,7 +159,12 @@ const DashboardContent = (props: DashboardContentProps) => {
           cursorStyle.current.cursorUrl
         }) ${size / 2} ${size / 2}, auto`;
     });
-  }, [tools.activeTool, tools.color, tools.size]);
+  }, [
+    tools.activeTool,
+    tools.eraser.size,
+    tools.pencil.color,
+    tools.pencil.size,
+  ]);
 
   // update cursor according to tool used
   useEffect(() => {
@@ -263,7 +272,7 @@ const DashboardContent = (props: DashboardContentProps) => {
       canvas.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
     };
-  }, [beginDrawing, draw, erase, tools.activeTool]);
+  }, [beginDrawing, draw, beginErasing, erase, tools.activeTool]);
 
   const handleClearCanvas = () => {
     canvasRef.current

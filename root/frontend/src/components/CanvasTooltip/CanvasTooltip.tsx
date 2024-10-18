@@ -4,7 +4,6 @@ import SelectColorDropdown from "./SelectColorDropdown/SelectColorDropdown";
 import { HexColor } from "../../types/Common";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import CreateIcon from "@mui/icons-material/Create";
-import BrushIcon from "@mui/icons-material/Brush";
 import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import classNames from "classnames";
 import { CanvasTools } from "../../types/Sheet";
@@ -21,15 +20,21 @@ const CanvasTooltip = ({ tools, setTools }: CanvasTooltipProps) => {
   const outsideClickRef = useOutsideClick(() => setOpenColorDropdown(false));
 
   const handleChangeColor = (color: HexColor) => {
-    setTools((prevTools) => ({ ...prevTools, color }));
+    setTools((prevTools) => ({
+      ...prevTools,
+      pencil: { ...prevTools.pencil, color },
+    }));
   };
 
   const handleChangeActiveTool = (tool: CanvasTools["activeTool"]) => {
-    setTools((prevTools) => ({ ...prevTools, activeTool: tool, size: 1 }));
+    setTools((prevTools) => ({ ...prevTools, activeTool: tool }));
   };
 
   const handleChangeToolSize = (size: number) => {
-    setTools((prevTools) => ({ ...prevTools, size }));
+    setTools((prevTools) => ({
+      ...prevTools,
+      [tools.activeTool]: { ...prevTools[prevTools.activeTool], size },
+    }));
   };
 
   return (
@@ -44,16 +49,6 @@ const CanvasTooltip = ({ tools, setTools }: CanvasTooltipProps) => {
           onClick={() => handleChangeActiveTool("pencil")}
         >
           <CreateIcon sx={{ color: "white" }} fontSize="small" />
-        </button>
-        <button
-          className={classNames(
-            styles.tool_btn,
-            tools.activeTool === "brush" ? styles.active_tool : ""
-          )}
-          title="Brush"
-          onClick={() => handleChangeActiveTool("brush")}
-        >
-          <BrushIcon sx={{ color: "white" }} fontSize="small" />
         </button>
         <button
           className={classNames(
@@ -73,12 +68,12 @@ const CanvasTooltip = ({ tools, setTools }: CanvasTooltipProps) => {
         <div
           onClick={() => setOpenColorDropdown(true)}
           className={styles.selected_color}
-          style={{ backgroundColor: tools.color }}
+          style={{ backgroundColor: tools.pencil.color }}
           ref={outsideClickRef}
         >
           {openColorDropdown && (
             <SelectColorDropdown
-              selectedColor={tools.color}
+              selectedColor={tools.pencil.color}
               onSelectColor={handleChangeColor}
             />
           )}
@@ -90,10 +85,10 @@ const CanvasTooltip = ({ tools, setTools }: CanvasTooltipProps) => {
           type="range"
           min={1}
           max={100}
-          value={tools.size}
+          value={tools[tools.activeTool].size}
           onChange={(e) => handleChangeToolSize(+e.target.value)}
         />
-        <p>{tools.size}</p>
+        <p>{tools[tools.activeTool].size}</p>
       </div>
     </div>
   );

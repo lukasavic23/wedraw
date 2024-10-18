@@ -7,7 +7,7 @@ export interface ISheet {
 }
 
 export interface CanvasTools {
-  activeTool: "pencil" | "brush" | "eraser";
-  color: HexColor;
-  size: number;
+  activeTool: "pencil" | "eraser";
+  pencil: { color: HexColor; size: number };
+  eraser: { size: number };
 }
